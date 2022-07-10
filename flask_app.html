@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>2022交大資訊逐夢營</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+        <script src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+      	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    </head>
+
+    <body>
+
+        <br>
+        <div class="jumbotron">
+          <center><h2 id="title">2022 交大資訊逐夢營 </h2>  <h1> MNIST 數字手寫辨識</h1></center>
+        </div>
+
+        <br>
+        <form name="image_form" action="/" method="POST" enctype="multipart/form-data">
+            <input type="hidden" id="type" name="type" value="k">
+            <input type="hidden" id="payload" name="payload" value="x">
+            <div style="width: 800px; margin: 0 auto; justify-content: center; align-items: center">
+
+                <div id="capture" style="width: 280px; height: 280px; float:left; border:1px solid rgb(100, 100, 100); font-size: 280px; line-height: 280px; text-align: center">
+                    <!-- <img src="" id="preview" style="width: 280px; height: 280px; float:left;"> -->
+                    <canvas id="myCanvas"></canvas>
+                </div>
+
+                <div style="width: 230px; height: 280px; float: left; position:relative">
+                    <!-- <input type="file" name="file" id="filetag" accept="image/png, image/jpeg, image/jpg" style="width: 75%; position:absolute; top: 30%; left: 12%">
+                    <input id="predict" class="cust_button" type="submit" value="Upload" style="width: 75%; position:absolute; top: 50%; left: 12%"/> -->
+
+                      <button type="button" class="btn btn-lg btn-primary" onclick="kmean();" style="width: 75%; position:absolute; top: 5%; left: 12%" >K-means</button>
+                      <button type="button" class="btn btn-lg btn-primary" onclick="nb();" style="width: 75%; position:absolute; top: 25%; left: 12%" >Naive Bayes</button>
+                      <button type="submit" class="btn btn-lg btn-success" style="width: 75%; position:absolute; top: 61%; left: 12%" >預測</button>
+                      <button type="button" class="btn btn-lg btn-danger" onclick="clearPad();" style="width: 75%; position:absolute; top: 82%; left: 12%" >清除</button>
+
+                </div>
+
+
+
+                <div style="width: 280px; height: 280px; float:left; border:1px solid black; font-size: 280px; line-height: 280px; text-align: center">
+                    <span id="num" style="">{{number}}</span>
+                </div>
+            </div>
+        </form>
+
+    </body>
+
+    <script type="text/javascript">
+      function kmean() {
+        document.getElementById("type").value = "k";
+      }
+
+      function nb() {
+        document.getElementById("type").value = "n";
+      }
+    </script>
+
+    <script type="text/javascript">
+      //這一行去抓取canvas的標籤
+      let canvas = document.getElementById("myCanvas");
+      //接著指定繪圖方式
+      let ctx = canvas.getContext("2d");
+      //讓canvas的高度和寬度等於整個畫面，讓整個視窗都是你的畫布
+      // canvas.height = window.innerHeight;
+      // canvas.width = window.innerWidth;
+      canvas.height = 280;
+      canvas.width = 280;
+
+      function mouseDown(e){
+          this.draw=true;
+          this.ctx = this.getContext("2d");
+          this.ctx.strokeStyle='#000000';
+          this.ctx.lineWidth=12;
+
+          var o=this;
+          this.offsetX=this.offsetLeft;
+          this.offsetY=this.offsetTop;
+
+          while(o.offsetParent){
+          	o=o.offsetParent;
+          	this.offsetX+=o.offsetLeft;
+          	this.offsetY+=o.offsetTop;
+          }
+
+          this.ctx.beginPath();
+          this.ctx.moveTo(e.pageX-this.offsetX,e.pageY-this.offsetY);
+      }
+
+      function mouseMove(e){
+          if (this.draw){
+              this.ctx.lineTo(e.pageX-this.offsetX,e.pageY-this.offsetY);
+              this.ctx.stroke();
+          }
+      }
+
+      function mouseUp(e){
+          this.draw=false;
+          block_capture();
+      }
+
+      function touchStart(e){
+          this.draw=true;
+          this.ctx=this.getContext("2d");
+          this.touch=e.targetTouches[0];
+          this.ctx.strokeStyle='#000000';
+          this.ctx.lineWidth=2;
+
+          var o=this;
+          this.offsetX=this.offsetLeft;
+          this.offsetY=this.offsetTop;
+
+          while(o.offsetParent){
+          	o=o.offsetParent;
+          	this.offsetX+=o.offsetLeft;
+          	this.offsetY+=o.offsetTop;
+          }
+
+          this.ctx.beginPath();
+          this.ctx.moveTo(this.touch.pageX-this.offsetX,this.touch.pageY-this.offsetY);
+          e.preventDefault();
+      }
+
+      function touchMove(e){
+          this.touch=e.targetTouches[0];
+          if (this.draw){
+              this.ctx.lineTo(this.touch.pageX-this.offsetX,this.touch.pageY-this.offsetY);
+              this.ctx.stroke();
+          }
+          e.preventDefault();
+      }
+
+      function touchEnd(e){
+          this.draw=false;
+          e.preventDefault();
+      }
+
+      function clearPad(){
+          var canvas=document.querySelector('#myCanvas');
+          var ctx=canvas.getContext("2d");
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+          document.getElementById("payload").value = "x";
+      }
+
+      window.addEventListener('load',function(){
+          var canvas=document.querySelector('#myCanvas');
+
+          canvas.addEventListener('mousedown',mouseDown);
+          canvas.addEventListener('mousemove',mouseMove);
+          canvas.addEventListener('mouseup',mouseUp);
+
+          canvas.addEventListener('touchstart',touchStart);
+          canvas.addEventListener('touchmove',touchMove);
+          canvas.addEventListener('touchend',touchEnd);
+      });
+
+      function block_capture() {
+        html2canvas(document.querySelector("#capture")).then(function (canvas) {
+          a = document.createElement("a");
+          a.href = canvas
+            .toDataURL("image/jpeg", 0.92);
+
+          console.log(a);
+          document.getElementById("payload").value = a.href;
+          // a.download = "image.jpg";
+          // a.click();
+        });
+      }
+
+
+    </script>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+
+</html>
