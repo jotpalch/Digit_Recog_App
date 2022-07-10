@@ -32,8 +32,8 @@
                     <!-- <input type="file" name="file" id="filetag" accept="image/png, image/jpeg, image/jpg" style="width: 75%; position:absolute; top: 30%; left: 12%">
                     <input id="predict" class="cust_button" type="submit" value="Upload" style="width: 75%; position:absolute; top: 50%; left: 12%"/> -->
 
-                      <button type="button" class="btn btn-lg btn-primary" onclick="kmean();" style="width: 75%; position:absolute; top: 5%; left: 12%" >K-means</button>
-                      <button type="button" class="btn btn-lg btn-primary" onclick="nb();" style="width: 75%; position:absolute; top: 25%; left: 12%" >Naive Bayes</button>
+                      <button type="button" id="km" class="btn btn-lg btn-outline-dark" onclick="kmean();" style="width: 75%; position:absolute; top: 5%; left: 12%" >K-means</button>
+                      <button type="button" id="nb" class="btn btn-lg btn-primary" onclick="nbf();" style="width: 75%; position:absolute; top: 25%; left: 12%" >Naive Bayes</button>
                       <button type="submit" class="btn btn-lg btn-success" style="width: 75%; position:absolute; top: 61%; left: 12%" >預測</button>
                       <button type="button" class="btn btn-lg btn-danger" onclick="clearPad();" style="width: 75%; position:absolute; top: 82%; left: 12%" >清除</button>
 
@@ -52,10 +52,14 @@
     <script type="text/javascript">
       function kmean() {
         document.getElementById("type").value = "k";
+        document.getElementById("km").className  = "btn btn-lg btn-primary";
+        document.getElementById("nb").className  = "btn btn-lg btn-outline-dark";
       }
 
-      function nb() {
+      function nbf() {
         document.getElementById("type").value = "n";
+        document.getElementById("nb").className  = "btn btn-lg btn-primary";
+        document.getElementById("km").className  = "btn btn-lg btn-outline-dark";
       }
     </script>
 
